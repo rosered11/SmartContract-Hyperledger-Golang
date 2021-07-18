@@ -49,17 +49,25 @@ function reset_chaincode_variables {
     INTERNAL_DEV_VERSION="1"
 }
 
-# Common location for the generated packages
-CC2_PACKAGE_FOLDER=$HOME/packages
-
 DIR="$( which set-chain-env.sh)"
 DIR="$(dirname $DIR)"
+
+function mylog_write {
+    echo "---> ${0##*/} => $@" >> $DIR/my-log.txt
+}
+
+# Common location for the generated packages
+CC2_PACKAGE_FOLDER=$HOME/packages
+mylog_write "# CC2_PACKAGE_FOLDER: $CC2_PACKAGE_FOLDER"
+
+
 # echo $DIR
 source $DIR/to_absolute_path.sh
 # Read the current setup
 source   $DIR/cc.env.sh
 
 CC2_ENV_FOLDER="$DIR/env"
+mylog_write "# CC2_ENV_FOLDER: $ABS_PATH"
 mkdir -p $CC2_ENV_FOLDER
 
 if [ "$#" == "0" ]; then
@@ -184,7 +192,7 @@ done
 if [ -z "$CC_LANGUAGE" ]; then
     CC_LANGUAGE=golang
 fi
-
+mylog_write "# CC_LANGUAGE: $CC_LANGUAGE"
 
 
 #env | grep CC_ > $DIR/cc.env.sh
@@ -212,6 +220,7 @@ echo "export CC2_ENDORSING_PEERS=\"$CC2_ENDORSING_PEERS\"" >> $DIR/cc.env.sh
 echo "export CC2_ENV_FOLDER=\"$CC2_ENV_FOLDER\"" >> $DIR/cc.env.sh
 echo "export INTERNAL_DEV_VERSION=\"$INTERNAL_DEV_VERSION\"" >> $DIR/cc.env.sh
 
+mylog_write "# Generate : $DIR/$(cc.env.sh)"
 
 # if [[ $0 = *"set-chain-env.sh" ]]
 # then
