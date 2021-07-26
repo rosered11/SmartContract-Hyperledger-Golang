@@ -12,6 +12,10 @@ usage() {
 DIR="$( which $BASH_SOURCE)"
 DIR="$(dirname $DIR)"
 
+function mylog_write {
+    echo "---> ${0##*/} => $@" >> $DIR/my-log.txt
+}
+
 export BINS_FOLDER=$DIR
 
 source $DIR/to_absolute_path.sh
@@ -23,10 +27,12 @@ DIR=$ABS_PATH
 export FABRIC_CFG_PATH="$DIR/../config"
 to-absolute-path $FABRIC_CFG_PATH
 FABRIC_CFG_PATH=$ABS_PATH
+mylog_write "# FABRIC_CFG_PATH: $FABRIC_CFG_PATH"
 
 
 # export ORDERER_ADDRESS=localhost:7050
 export ORDERER_ADDRESS=orderer.acme.com:7050
+mylog_write "# ORDERER_ADDRESS: $ORDERER_ADDRESS"
 
 # Sets the ORG Name
 ORG_NAME=$1
@@ -48,26 +54,34 @@ else
     usage                            
     echo "INVALID ORG Name!!!"
 fi
+
+mylog_write "# CORE_PEER_ADDRESS: $CORE_PEER_ADDRESS"
+
 export CORE_PEER_ID=$ORG_NAME-peer1.$ORG_NAME.com
+
+mylog_write "# CORE_PEER_ID: $CORE_PEER_ID"
 
 # Create the path to the crypto config folder
 CRYPTO_CONFIG_ROOT_FOLDER=$DIR/../crypto/crypto-config/peerOrganizations
+mylog_write "# CRYPTO_CONFIG_ROOT_FOLDER: $CRYPTO_CONFIG_ROOT_FOLDER"
 export CORE_PEER_MSPCONFIGPATH=$CRYPTO_CONFIG_ROOT_FOLDER/$ORG_NAME.com/users/Admin@$ORG_NAME.com/msp
 to-absolute-path $CORE_PEER_MSPCONFIGPATH
 CORE_PEER_MSPCONFIGPATH=$ABS_PATH
+mylog_write "# CORE_PEER_MSPCONFIGPATH: $CORE_PEER_MSPCONFIGPATH"
 
 # Capitalize the first letter of Org name e.g., acme => Acme  budget => Budget
 MSP_ID="$(tr '[:lower:]' '[:upper:]' <<< ${ORG_NAME:0:1})${ORG_NAME:1}"
 export CORE_PEER_LOCALMSPID=$MSP_ID"MSP"
+mylog_write "# CORE_PEER_LOCALMSPID: $CORE_PEER_LOCALMSPID"
 
 # Setup the default logging spec to info
 if [ -z "$FABRIC_LOGGING_SPEC" ]; then
     export FABRIC_LOGGING_SPEC=info
 fi
-
+mylog_write "# FABRIC_LOGGING_SPEC: $FABRIC_LOGGING_SPEC"
 # Sets the current org
 export ORGANIZATION_CONTEXT=$1
-
+mylog_write "# ORGANIZATION_CONTEXT: $ORGANIZATION_CONTEXT"
 # show-env.sh
 
 
